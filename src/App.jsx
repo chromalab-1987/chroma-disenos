@@ -3,7 +3,8 @@ import ClientList from "./components/ClientList.jsx";
 import ClientDetail from "./components/ClientDetail.jsx";
 import BrandKitWizard from "./components/BrandKitWizard.jsx";
 import ProjectForm from "./components/ProjectForm.jsx";
-import { loadClients, createClient, updateClient, updateBrandKit, addProject } from "./lib/store.js";
+import ProposalsScreen from "./components/ProposalsScreen.jsx";
+import { loadClients, createClient, updateClient, updateBrandKit, addProject, updateProject } from "./lib/store.js";
 
 export default function App() {
   const [clients, setClients] = useState([]);
@@ -28,13 +29,22 @@ export default function App() {
     setView({ screen: "detail", clientId: view.clientId });
   };
 
-  const handleSaveProject = (project) => {
+  // El proyecto ya trae los 3 prompts armados (Fase 2) — se guarda y se pasa a generar propuestas (Fase 3)
+  const handleProjectPromptsReady = (project) => {
     addProject(view.clientId, project);
+    refresh();
+    setView({ screen: "proposals", clientId: view.clientId, projectId: project.id });
+  };
+
+  // Se llama cuando ya se generó y eligió la imagen final en alta resolución
+  const handleProposalsDone = (updatedProject) => {
+    updateProject(view.clientId, updatedProject.id, updatedProject);
     refresh();
     setView({ screen: "detail", clientId: view.clientId });
   };
 
   const current = clients.find((c) => c.id === view.clientId);
+  const currentProject = current?.proyectos.find((p) => p.id === view.projectId);
 
   return (
     <div className="shell">
@@ -54,7 +64,7 @@ export default function App() {
             client={current}
             onEditKit={() => setView({ screen: "wizard", clientId: current.id })}
             onNewProject={() => setView({ screen: "project", clientId: current.id })}
-            onOpenProject={() => {}}
+            onOpenProject={(projectId) => setView({ screen: "proposals", clientId: current.id, projectId })}
             onBack={() => setView({ screen: "list" })}
           />
         )}
@@ -70,7 +80,16 @@ export default function App() {
         {view.screen === "project" && current && (
           <ProjectForm
             client={current}
-            onSave={handleSaveProject}
+            onSave={handleProjectPromptsReady}
+            onCancel={() => setView({ screen: "detail", clientId: current.id })}
+          />
+        )}
+
+        {view.screen === "proposals" && current && currentProject && (
+          <ProposalsScreen
+            client={current}
+            project={currentProject}
+            onDone={handleProposalsDone}
             onCancel={() => setView({ screen: "detail", clientId: current.id })}
           />
         )}
