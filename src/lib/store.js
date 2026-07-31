@@ -9,6 +9,11 @@ export const FORMATS = {
   story: { w: 1080, h: 1920, label: "Story / Banner" },
 };
 
+// Estimado de costo por imagen (USD), aproximado — ajustar según el pricing vigente de Gemini.
+export const COSTO_ESTIMADO = { baja: 0.04, alta: 0.15 };
+
+export const MAX_TANDAS = 2;
+
 export function emptyBrandKit() {
   return {
     logo: null, // dataURL
@@ -81,6 +86,7 @@ export function emptyProject() {
     propuestaElegidaId: null,
     disenoFinal: null,
     estado: "borrador", // borrador | en revision | aprobado | exportado
+    gastoAcumulado: 0,
     createdAt: new Date().toISOString(),
   };
 }
