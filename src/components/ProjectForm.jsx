@@ -47,7 +47,7 @@ export default function ProjectForm({ client, onSave, onCancel }) {
         <div className="btn-row">
           <button className="btn" onClick={() => setPreview(null)}>Volver a editar</button>
           <button className="btn" onClick={onCancel}>Cancelar</button>
-          <button className="btn btn-primary" onClick={handleConfirmar}>Guardar y continuar</button>
+          <button className="btn btn-primary" onClick={handleConfirmar}>Generar propuestas</button>
         </div>
       </div>
     );
