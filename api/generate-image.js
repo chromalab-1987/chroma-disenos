@@ -34,6 +34,7 @@ export default async function handler(req, res) {
     contents: [{ parts }],
     generationConfig: {
       responseModalities: ["TEXT", "IMAGE"],
+      temperature: 1.3,
       imageConfig: {
         aspectRatio: ASPECT_RATIO_BY_FORMAT[formato] || "1:1",
         imageSize: resolution === "alta" ? "2K" : "1K",
