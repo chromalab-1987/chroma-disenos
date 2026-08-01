@@ -1,9 +1,12 @@
 import { FORMATS } from "./store.js";
 
 const ESTILOS = {
-  minimalista: "Composición minimalista: mucho espacio vacío, un solo elemento visual protagonista, formas simples.",
-  bold: "Composición bold: colores de acento protagonistas, formas grandes, alto contraste.",
-  editorial: "Composición editorial tipo revista: capas, texturas o elementos gráficos sutiles de fondo.",
+  minimalista:
+    "Dirección de arte MINIMALISTA: fondo prácticamente vacío en un solo color plano (usar el color de fondo de la paleta), un único elemento geométrico simple (círculo, línea o forma orgánica sutil) como acento visual, mucho espacio negativo, sin texturas, sin fotografías, sin patrones, composición centrada o con mucho aire en los bordes. Sensación: calma, orden, lujo silencioso.",
+  bold:
+    "Dirección de arte BOLD: el color de acento ocupa como mínimo el 40% de la composición en un bloque grande y plano, formas geométricas grandes cortando la imagen en diagonal o en capas superpuestas, alto contraste entre el acento y el fondo, energía y movimiento visual, bordes que sangran fuera del cuadro. Sensación: impacto inmediato, imposible de scrollear sin verla.",
+  editorial:
+    "Dirección de arte EDITORIAL (tipo revista impresa): grid asimétrico con varios bloques de distinto tamaño, una textura sutil de grano o papel superpuesta a baja opacidad, líneas finas o marcos delgados como elementos gráficos, superposición leve de capas semitransparentes, paleta usada con matices y sombras en vez de colores planos. Sensación: sofisticado, con capas, como una tapa de revista de diseño.",
 };
 
 // Arma el prompt de texto que se le va a enviar a Gemini para un estilo puntual (uno de los 3).
@@ -23,7 +26,9 @@ export function buildPrompt({ brandKit, project, estiloKey }) {
   );
 
   if (brandKit.referencias.length > 0) {
-    lines.push("Imágenes de referencia de estilo adjuntas, con notas del cliente sobre qué le gusta de cada una:");
+    lines.push(
+      "Imágenes de referencia adjuntas — usarlas SOLO como guía general de mood/paleta, no copiar su composición ni su layout exacto (cada estilo pedido acá debe tener su propia composición, distinta entre sí):"
+    );
     brandKit.referencias.forEach((r, i) => {
       lines.push(`  Referencia ${i + 1}: ${r.nota || "(sin nota, usar solo como guía visual)"}`);
     });
