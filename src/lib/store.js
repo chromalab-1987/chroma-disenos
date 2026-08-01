@@ -1,3 +1,5 @@
+import { idbGet, idbSet } from "./idb.js";
+
 const KEY = "chromalab_clientes_v1";
 
 const uid = () => `${Date.now()}${Math.random().toString(36).slice(2, 7)}`;
@@ -25,21 +27,23 @@ export function emptyBrandKit() {
   };
 }
 
-export function loadClients() {
+// Nota: se guarda en IndexedDB (no localStorage) porque las imágenes en base64
+// pesan mucho y localStorage tiene un límite muy chico (~5-10MB por origen).
+export async function loadClients() {
   try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : [];
+    const data = await idbGet(KEY);
+    return data || [];
   } catch {
     return [];
   }
 }
 
-function saveClients(clients) {
-  localStorage.setItem(KEY, JSON.stringify(clients));
+async function saveClients(clients) {
+  await idbSet(KEY, clients);
 }
 
-export function createClient(name) {
-  const clients = loadClients();
+export async function createClient(name) {
+  const clients = await loadClients();
   const client = {
     id: uid(),
     name,
@@ -47,28 +51,28 @@ export function createClient(name) {
     proyectos: [],
     createdAt: new Date().toISOString(),
   };
-  saveClients([...clients, client]);
+  await saveClients([...clients, client]);
   return client;
 }
 
-export function updateClient(id, changes) {
-  const clients = loadClients();
+export async function updateClient(id, changes) {
+  const clients = await loadClients();
   const next = clients.map((c) => (c.id === id ? { ...c, ...changes } : c));
-  saveClients(next);
+  await saveClients(next);
   return next.find((c) => c.id === id);
 }
 
-export function updateBrandKit(id, brandKitChanges) {
-  const clients = loadClients();
+export async function updateBrandKit(id, brandKitChanges) {
+  const clients = await loadClients();
   const next = clients.map((c) =>
     c.id === id ? { ...c, brandKit: { ...c.brandKit, ...brandKitChanges } } : c
   );
-  saveClients(next);
+  await saveClients(next);
   return next.find((c) => c.id === id);
 }
 
-export function deleteClient(id) {
-  saveClients(loadClients().filter((c) => c.id !== id));
+export async function deleteClient(id) {
+  await saveClients((await loadClients()).filter((c) => c.id !== id));
 }
 
 export function emptyProject() {
@@ -91,23 +95,23 @@ export function emptyProject() {
   };
 }
 
-export function addProject(clientId, project) {
-  const clients = loadClients();
+export async function addProject(clientId, project) {
+  const clients = await loadClients();
   const next = clients.map((c) =>
     c.id === clientId ? { ...c, proyectos: [...c.proyectos, project] } : c
   );
-  saveClients(next);
+  await saveClients(next);
   return next.find((c) => c.id === clientId);
 }
 
-export function updateProject(clientId, projectId, changes) {
-  const clients = loadClients();
+export async function updateProject(clientId, projectId, changes) {
+  const clients = await loadClients();
   const next = clients.map((c) =>
     c.id === clientId
       ? { ...c, proyectos: c.proyectos.map((p) => (p.id === projectId ? { ...p, ...changes } : p)) }
       : c
   );
-  saveClients(next);
+  await saveClients(next);
   return next.find((c) => c.id === clientId);
 }
 
