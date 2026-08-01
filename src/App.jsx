@@ -10,36 +10,36 @@ export default function App() {
   const [clients, setClients] = useState([]);
   const [view, setView] = useState({ screen: "list" });
 
-  useEffect(() => { setClients(loadClients()); }, []);
+  useEffect(() => { refresh(); }, []);
 
-  const refresh = () => setClients(loadClients());
+  const refresh = async () => setClients(await loadClients());
 
-  const handleCreate = () => {
-    const client = createClient("");
-    refresh();
+  const handleCreate = async () => {
+    const client = await createClient("");
+    await refresh();
     setView({ screen: "wizard", clientId: client.id, isNew: true });
   };
 
   const handleOpen = (id) => setView({ screen: "detail", clientId: id });
 
-  const handleSaveKit = (name, brandKit) => {
-    updateClient(view.clientId, { name });
-    updateBrandKit(view.clientId, brandKit);
-    refresh();
+  const handleSaveKit = async (name, brandKit) => {
+    await updateClient(view.clientId, { name });
+    await updateBrandKit(view.clientId, brandKit);
+    await refresh();
     setView({ screen: "detail", clientId: view.clientId });
   };
 
   // El proyecto ya trae los 3 prompts armados (Fase 2) — se guarda y se pasa a generar propuestas (Fase 3)
-  const handleProjectPromptsReady = (project) => {
-    addProject(view.clientId, project);
-    refresh();
+  const handleProjectPromptsReady = async (project) => {
+    await addProject(view.clientId, project);
+    await refresh();
     setView({ screen: "proposals", clientId: view.clientId, projectId: project.id });
   };
 
   // Se llama cuando ya se generó y eligió la imagen final en alta resolución
-  const handleProposalsDone = (updatedProject) => {
-    updateProject(view.clientId, updatedProject.id, updatedProject);
-    refresh();
+  const handleProposalsDone = async (updatedProject) => {
+    await updateProject(view.clientId, updatedProject.id, updatedProject);
+    await refresh();
     setView({ screen: "detail", clientId: view.clientId });
   };
 
