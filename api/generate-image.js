@@ -17,17 +17,28 @@ const ASPECT_RATIO_BY_FORMAT = {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Método no permitido" });
 
-  const { prompt, formato, referenceImages = [], resolution = "baja", model = "gemini-3.1-flash-image-preview" } = req.body;
+  const { prompt, formato, referencias = [], resolution = "baja", model = "gemini-3.1-flash-image-preview" } = req.body;
 
   if (!prompt) return res.status(400).json({ error: "Falta el prompt" });
   if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: "GEMINI_API_KEY no configurada en el servidor" });
 
   const parts = [{ text: prompt }];
 
-  // Imágenes de referencia del brand kit, como parte del mismo mensaje (hasta 14 soportadas por el modelo)
-  for (const ref of referenceImages) {
-    const match = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/.exec(ref);
-    if (match) parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+  // Imágenes de referencia del brand kit, intercaladas con su nota — así el modelo asocia
+  // cada imagen con su descripción en vez de recibir un bloque de imágenes sueltas al final.
+  if (referencias.length > 0) {
+    parts.push({
+      text: "A continuación, imágenes de referencia de estilo del cliente. Analizá su paleta, texturas y mood, y usalas como inspiración visual — NO copies su composición ni su layout exacto:",
+    });
+    referencias.forEach((r, i) => {
+      const match = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/.exec(r.image || "");
+      if (!match) return;
+      parts.push({ text: `Referencia ${i + 1}${r.nota ? `: ${r.nota}` : ""}` });
+      parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+    });
+    parts.push({
+      text: "Fin de las referencias. Generá la imagen ahora aplicando la dirección de arte indicada arriba, tomando de estas referencias solo el lenguaje visual (paleta, texturas, mood), con una composición propia y distinta a la de las referencias.",
+    });
   }
 
   const body = {
