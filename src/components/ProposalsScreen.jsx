@@ -15,7 +15,7 @@ export default function ProposalsScreen({ client, project, onDone, onCancel }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const referenceImages = client.brandKit.referencias.map((r) => r.image);
+  const referencias = client.brandKit.referencias;
 
   const generarTanda = async () => {
     setGenerating(true);
@@ -28,7 +28,7 @@ export default function ProposalsScreen({ client, project, onDone, onCancel }) {
           imagenUrl: await generarImagen({
             prompt: proyecto.promptsPorEstilo[estilo],
             formato: proyecto.formato,
-            referenceImages,
+            referencias,
             resolution: "baja",
           }),
         }))
@@ -53,7 +53,7 @@ export default function ProposalsScreen({ client, project, onDone, onCancel }) {
       const imagenFinal = await generarImagen({
         prompt: proyecto.promptsPorEstilo[propuesta.estilo],
         formato: proyecto.formato,
-        referenceImages,
+        referencias,
         resolution: "alta",
       });
       const actualizado = {
