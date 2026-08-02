@@ -25,15 +25,6 @@ export function buildPrompt({ brandKit, project, estiloKey }) {
     `Estilo tipográfico de referencia: título con look "${brandKit.fontTitulo}", cuerpo con look "${brandKit.fontCuerpo}" (aproximar el carácter visual de estas fuentes).`
   );
 
-  if (brandKit.referencias.length > 0) {
-    lines.push(
-      "Imágenes de referencia adjuntas — usarlas SOLO como guía general de mood/paleta, no copiar su composición ni su layout exacto (cada estilo pedido acá debe tener su propia composición, distinta entre sí):"
-    );
-    brandKit.referencias.forEach((r, i) => {
-      lines.push(`  Referencia ${i + 1}: ${r.nota || "(sin nota, usar solo como guía visual)"}`);
-    });
-  }
-
   if (project.modoEntrada === "copy") {
     lines.push(`Contenido/copy a comunicar visualmente: "${project.copyTexto}"`);
   } else {
